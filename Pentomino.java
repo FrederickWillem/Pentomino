@@ -1,20 +1,13 @@
 package data;
 
-import java.awt.Color;
 import java.awt.Point;
 
 public class Pentomino {
 
-	int[][] shape;
-	Color color;
-	int id;
+	private int[][] shape;
 
 	public Pentomino(int[][] shape) {
 		this.shape = shape;
-	}
-	
-	public int getID() {
-		return id;
 	}
 	
 	public int[][] getShape() {
@@ -24,7 +17,7 @@ public class Pentomino {
 	public Point getPinPoint() {
 		for (int i = 0; i < shape.length; i++) {
 			for (int j = 0; j < shape[0].length; j++) {
-				if (shape[i][j] == 1)
+				if (shape[i][j] != 0)
 					return new Point(i, j);
 			}
 		}

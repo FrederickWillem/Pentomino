@@ -9,7 +9,7 @@ public class Solver {
 			System.out.println(Arrays.toString(board[i]));
 		System.out.println("Done!");
 		boolean solved = false;
-		if (board.length * board[0].length % 5 != 0)
+		if (board.length * board[0].length / 5 != pentominoes.length)
 			return;
 		for (Boolean b : used) {
 			if (b)
@@ -66,7 +66,7 @@ public class Solver {
 	static boolean checkPiece(int x, int y, Pentomino p, int[][] board) {
 		for (int i = 0; i < p.getShape().length; i++) {
 			for (int j = 0; j < p.getShape()[0].length; j++) {
-				if (p.getShape()[i][j] == 1 && board[x + i - p.getPinPoint().x][y + j - p.getPinPoint().y] == 1)
+				if (p.getShape()[i][j] != 0 && board[x + i - p.getPinPoint().x][y + j - p.getPinPoint().y] != 0)
 					return false;
 			}
 		}
@@ -82,8 +82,8 @@ public class Solver {
 		}
 		for (int i = 0; i < p.getShape().length; i++) {
 			for (int j = 0; j < p.getShape()[0].length; j++) {
-				if (p.getShape()[i][j] == 1)
-					newBoard[x + i - p.getPinPoint().x][y + j - p.getPinPoint().y] = 1;
+				if (p.getShape()[i][j] != 0)
+					newBoard[x + i - p.getPinPoint().x][y + j - p.getPinPoint().y] = p.getShape()[i][j];
 			}
 		}
 		return newBoard;
