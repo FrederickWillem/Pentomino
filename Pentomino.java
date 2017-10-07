@@ -18,7 +18,7 @@ public class Pentomino {
 		for (int i = 0; i < shape.length; i++) {
 			for (int j = 0; j < shape[0].length; j++) {
 				if (shape[i][j] != 0)
-					return new Point(i, j);
+					return new Point(j, i);
 			}
 		}
 		return null;
