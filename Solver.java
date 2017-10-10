@@ -1,10 +1,14 @@
 package data;
 
+import java.util.ArrayList;
+
 public class Solver {
 	
 	static int count = 0;
-	static boolean solved;
+	public static boolean solved;
 	public static int[][] publicBoard;
+	public static ArrayList<int[][]> solutions = new ArrayList<>();
+	public static boolean allSolutions;
 
 	public static void solve(boolean[] used, int[][] board, Pentomino... pentominoes) {
 		publicBoard = new int[board.length][board[0].length];
@@ -18,7 +22,7 @@ public class Solver {
  		count = 0;
  		if (Startup.p != null)
  			Startup.p.repaint();
-		if (board.length * board[0].length / 5 != pentominoes.length)
+		if (board.length * board[0].length % 5 != 0)
 			return;
 		for (Boolean b : used) {
 			if (b)
@@ -28,10 +32,12 @@ public class Solver {
 				break;
 			}
 		}
-		if (solved)
+		if (solved) {
 			System.out.println("Solved in " + (System.nanoTime() - Startup.startTime) * Math.pow(10, -6) + " milliseconds");
-		for (int row = 0; row < board.length; row++) {
-			for (int col = 0; col < board[0].length; col++) {
+			solutions.add(board);
+		}
+		for (int col = 0; col < board[0].length; col++) {
+			for (int row = 0; row < board.length; row++) {
 				if (board[row][col] == 0) {
 					gapSizeCheck(row, col);
 					if (count % 5 != 0) {
@@ -39,17 +45,19 @@ public class Solver {
 					}
 					for (int i = 0; i < pentominoes.length; i++) {
 						if (!used[i]) {
-							for (Pentomino p : getAllFormats(pentominoes[i])) {
-								if (inBounds(row, col, p, board) && checkPiece(row, col, p, board)) {
-									int[][] newBoard = placePiece(row, col, p, board);
-									boolean[] newUsed = new boolean[used.length];
-									for (int j = 0; j < newUsed.length; j++) {
-										newUsed[j] = used[j];
+							for (Pentomino p : pentominoes[i].getAllFormats()) {
+								if (p != null) {
+									if (inBounds(row, col, p, board) && checkPiece(row, col, p, board)) {
+										int[][] newBoard = placePiece(row, col, p, board);
+										boolean[] newUsed = new boolean[used.length];
+										for (int j = 0; j < newUsed.length; j++) {
+											newUsed[j] = used[j];
+										}
+										newUsed[i] = true;
+										solve(newUsed, newBoard, pentominoes);
+										if (!allSolutions && solved)
+											return;
 									}
-									newUsed[i] = true;
-									solve(newUsed, newBoard, pentominoes);
-									if (solved)
-										return;
 								}
 							}
 						}
@@ -78,7 +86,7 @@ public class Solver {
 	}
 
 	static boolean inBounds(int y, int x, Pentomino p, int[][] board) {
-		if (y - p.getPinPoint().y < 0 || x - p.getPinPoint().x < 0 || y + p.getShape().length > board.length || x + p.getShape()[0].length - p.getPinPoint().y > board[0].length) {
+		if (y - p.getPinPoint().y < 0 || x - p.getPinPoint().x < 0 || y + p.getShape().length - p.getPinPoint().y > board.length || x + p.getShape()[0].length - p.getPinPoint().x > board[0].length) {
 			return false;
 		}
 		return true;
@@ -87,8 +95,9 @@ public class Solver {
 	static boolean checkPiece(int y, int x, Pentomino p, int[][] board) {
 		for (int i = 0; i < p.getShape().length; i++) {
 			for (int j = 0; j < p.getShape()[0].length; j++) {
-				if (p.getShape()[i][j] != 0 && board[y + i - p.getPinPoint().y][x + j - p.getPinPoint().x] != 0)
+				if (p.getShape()[i][j] != 0 && board[y + i - p.getPinPoint().y][x + j - p.getPinPoint().x] != 0) {
 					return false;
+				}
 			}
 		}
 		return true;
@@ -109,15 +118,6 @@ public class Solver {
 		}
 		return newBoard;
 	}
+	
 
-	public static Pentomino[] getAllFormats(Pentomino p) {
-		Pentomino[] pentominoes = new Pentomino[8];
-		int currentIndex = 0;
-		for (int i = 0; i < 4; i++) {
-			pentominoes[currentIndex] = new Pentomino(p.getRotatedFormat(i));
-			pentominoes[currentIndex + 1] = new Pentomino(new Pentomino(p.getHorizontalMirroredFormat()).getRotatedFormat(i));
-			currentIndex += 2;
-		}
-		return pentominoes;
-	}
 }

@@ -25,7 +25,7 @@ public class Panel extends JPanel {
 		for (int i = 0; i < Solver.publicBoard.length; i++) {
 			for (int j = 0; j < Solver.publicBoard[0].length; j++) {
 				g.setColor(colors[Solver.publicBoard[i][j]]);
-				g.fillRect(i * 50, j * 50, 50, 50);
+				g.fillRect(j * 50, i * 50, 50, 50);
 			}
 		}
 	}
