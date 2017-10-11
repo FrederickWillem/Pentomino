@@ -12,12 +12,14 @@ public class Panel extends JPanel {
 	 */
 	private static final long serialVersionUID = -4121946950366401500L;
 	
+	//Constructor for the panel which extends JPanel. This is done so as to be able to Override paintComponent().
 	public Panel() {
 		setBounds(0, 0, Solver.publicBoard.length * 50, Solver.publicBoard[0].length * 50);
 		setVisible(true);
 		repaint();
 	}
 	
+	//Method responsible for drawing the board, using the number displayed in a cell as indication for the color that should be used to display a pentomino.
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
