@@ -6,11 +6,11 @@ import java.util.Scanner;
 import javax.swing.JFrame;
 
 public class Startup {
-
+	
 	public static long startTime = 0;
 	public static Panel p;
 	public static boolean flip;
-
+	
 	public static void main(String[] args) {
 		//Creating a scanner and asking the user for the letters to be used. These are then transformed into Pentomino's, which the program can use.
 		Scanner sc = new Scanner(System.in);
@@ -30,7 +30,7 @@ public class Startup {
 				}
 			}
 		}
-
+		
 		//Asking the user for any other input which are required, such as the board's width, height and whether the user wishes to see every solution or not. Also a small delay if the user pleases.
 		System.out.println("Please give the width of the board:");
 		int width = sc.nextInt();
@@ -48,39 +48,39 @@ public class Startup {
 			System.out.println("Disobedient brat! Guess you'll get no delay!");
 			Solver.delay = 0;
 		}
-
+		
 		//"Cheating": we flip the board 90 degrees when the height is greater than the width: our solver solves this faster. We then flip it back for the user to see.
 		if (height > width)
 			flip = true;
-
+		
 		//Setting the start time to keep track of speed.
 		startTime = System.nanoTime();
-
+		
 		//Computing every possible orientation for every pentomino used. Done here so that it needs not be done every loop.
 		for (Pentomino p : pentominoes) {
 			p.computeAllFormats();
 		}
-
+		
 		//Creating a new Thread to draw the board and the pentominoes, so as to make sure we can update the frame while looping through solutions
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				drawBoard();
+				drawBoard();				
 			}
 		}).start();
-
+		
 		//Calling the solve method.
 		Solver.solve(new boolean[pentominoes.length], new int[flip ? width : height][flip ? height : width], pentominoes);
-
+		
 		//Checking whether any solutions have been found. If not, the program will shut down.
 		if (!Solver.solved && Solver.solutions.isEmpty()) {
 			System.out.println("Didn't manage to solve it... it took me " + (System.nanoTime() - startTime) * Math.pow(10, -6) + " milliseconds to realise this.");
 			System.exit(0);
 		}
-
+		
 		//Removing any symmetrical solutions which may still be present in the list of solutions (dependent on user input).
 		ArrayList<int[][]> solutions = Solver.removeSymmetry();
-
+		
 		//Returning the output to the user. Depending on the amount of solutions found, the user can scroll through them as they please, using an input.
 		System.out.println("I managed to find " + solutions.size() + " solution" + (solutions.size() > 1 ? "s" : "") + " for you!");
 		System.out.println("It took me a total of " + (System.nanoTime() - startTime) * Math.pow(10, -6) + " milliseconds!");
@@ -96,7 +96,7 @@ public class Startup {
 		}
 		sc.close();
 	}
-
+	
 	//Simple method creating a new frame of the correct size and adding a panel to it, which will be responsible for drawing the board.
 	public static void drawBoard() {
 		JFrame frame = new JFrame();
