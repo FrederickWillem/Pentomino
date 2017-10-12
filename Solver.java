@@ -4,35 +4,47 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Solver {
-	
+
 	public static boolean solved;
 	public static int[][] publicBoard;
 	public static ArrayList<int[][]> solutions = new ArrayList<>();
 	public static boolean allSolutions;
+	public static int delay;
 
 	public static void solve(boolean[] used, int[][] board, Pentomino[] pentominoes) {
 		//Checking whether the given board is a multiple of 5 (otherwise it cannot be solved).
 		if (board.length * board[0].length % 5 != 0 || board.length == 0 || board[0].length == 0)
 			return;
-		
+
 		//Updating several int[][]'s. publicBoard is the board Panel.java uses to draw the current state of the board.
 		//tempBoard is the board used in the gapSizeCheck method. Its 0's will be changed to -1's and for this reason, tempBoard must be reset on every loop.
-		publicBoard = new int[board.length][board[0].length];
+		if (Startup.flip)
+			publicBoard = new int[board[0].length][board.length];
+		else
+			publicBoard = new int[board.length][board[0].length];
 		tempBoard = new int[board.length][board[0].length];
 		for (int i = 0; i < board.length; i++) {
 			for (int j = 0; j < board[0].length; j++) {
 				tempBoard[i][j] = board[i][j];
-				publicBoard[i][j] = board[i][j];
+				if (!Startup.flip)
+					publicBoard[i][j] = board[i][j];
 			}
 		}
-		
+		if (Startup.flip)
+			publicBoard = getRotatedFormat(1, board);
 		//Count is also used in gapCheckSize and must be reset.
  		count = 0;
- 		
+
+ 		try {
+			Thread.sleep(delay);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
  		//If the panel has been created (!= null check), it needs to be updated on every loop.
  		if (Startup.p != null)
  			Startup.p.repaint();
-		
+
  		//Checking whether every cell has been filled.
  		//If so, the puzzle is solved and, depending on the user input, we can stop checking entirely or keep going and looking for more solutions.
  		solved = true;
@@ -47,7 +59,7 @@ public class Solver {
 			if (!allSolutions)
 				return;
 		}
-		
+
 		for (int col = 0; col < board[0].length; col++) {
 			for (int row = 0; row < board.length; row++) {
 				if (board[row][col] == 0) {
@@ -77,10 +89,10 @@ public class Solver {
 			}
 		}
 	}
-	
+
 	static int[][] tempBoard;
 	static int count = 0;
-	
+
 	static int gapSizeCheck(int y, int x) {
 		tempBoard[y][x] = -1;
 		count++;
@@ -130,7 +142,7 @@ public class Solver {
 		}
 		return newBoard;
 	}
-	
+
 	public static int[][] getRotatedFormat(int rotation, int[][] shape) {
 		rotation %= 4;
 		if (rotation == 0)
@@ -157,7 +169,7 @@ public class Solver {
 		}
 		return tempShape;
 	}
-	
+
 	public static int[][] getHorizontalMirroredFormat(int[][] shape) {
 		int[][] tempShape = new int[shape.length][shape[0].length];
 		for (int i = 0; i < shape.length; i++) {
@@ -165,22 +177,20 @@ public class Solver {
 		}
 		return tempShape;
 	}
-	
+
 	public static boolean isEqual(int[][] shape1, int[][] shape2) {
 		if (shape1 == null || shape2 == null)
 			return false;
 		if (shape1.length != shape2.length || shape1[0].length != shape2[0].length)
 			return false;
 		for (int i = 0; i < shape1.length; i++) {
-			for (int j = 0; j < shape1[0].length; j++) {
-				if (shape1[i][j] != shape2[i][j])
-					return false;
-			}
+			if (!arrayEquals(shape1[i], shape2[i]))
+				return false;
 		}
 		return true;
 	}
 
-	
+
 	public static int[] mirrorArray(int[] array) {
 		int[] newArray = new int[array.length];
 		for (int i = 0; i < array.length; i++) {
@@ -188,7 +198,7 @@ public class Solver {
 		}
 		return newArray;
 	}
-	
+
 	public static ArrayList<int[][]> removeSymmetry() {
 		ArrayList<int[][]> result = new ArrayList<>();
 		if (solutions.size() > 1) {
@@ -199,22 +209,34 @@ public class Solver {
 					int[][] solution1 = solutions.get(i);
 					for (int j = 0; j < solutions.size(); j++) {
 						int[][] solution2 = solutions.get(j);
-						if (Arrays.equals(solution1[0], solution2[solution2.length - 1]) && Arrays.equals(solution1[solution1.length - 1], solution2[0]))
+						if (arrayEquals(solution1[0], solution2[solution2.length - 1]) && arrayEquals(solution1[solution1.length - 1], solution2[0]))
 							toBeRemoved.add(j);
-						if (Arrays.equals(mirrorArray(solution1[0]), solution2[0]) && Arrays.equals(mirrorArray(solution1[solution1.length - 1]), solution2[solution2.length - 1]))
+						if (arrayEquals(mirrorArray(solution1[0]), solution2[0]) && arrayEquals(mirrorArray(solution1[solution1.length - 1]), solution2[solution2.length - 1]))
 							toBeRemoved.add(j);
-						if (Arrays.equals(mirrorArray(solution1[0]), solution2[solution2.length - 1]) && Arrays.equals(mirrorArray(solution1[solution1.length - 1]), solution2[0]))
+						if (arrayEquals(mirrorArray(solution1[0]), solution2[solution2.length - 1]) && arrayEquals(mirrorArray(solution1[solution1.length - 1]), solution2[0]))
 							toBeRemoved.add(j);
 					}
 				}
-			
+
 			//Actually removing all the symmetrical inputs and only putting the unique ones in a new list: solutions.
 			for (int i = 0; i < solutions.size(); i++)
 				if (!toBeRemoved.contains(i))
 					result.add(solutions.get(i));
 			return result;
-		} else {			
+		} else {
 			return solutions;
 		}
+	}
+
+	public static boolean arrayEquals(int[] array1, int[] array2) {
+		if (array1 == null || array2 == null)
+			return false;
+		if (array1.length != array2.length)
+			return false;
+		for (int i = 0; i < array1.length; i++) {
+			if (array1[i] != array2[i])
+				return false;
+		}
+		return true;
 	}
 }

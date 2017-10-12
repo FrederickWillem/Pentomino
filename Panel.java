@@ -23,11 +23,15 @@ public class Panel extends JPanel {
 	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		Color[] colors = new Color[]{new Color(0, 150, 0), Color.BLUE, Color.CYAN, Color.GREEN, Color.MAGENTA, Color.ORANGE, Color.PINK, Color.RED, Color.BLACK, Color.DARK_GRAY, Color.GRAY, Color.YELLOW, Color.WHITE};
+		Color[] colors = new Color[]{Color.BLACK, new Color(255, 177, 125), new Color(254, 188, 205), new Color(166, 255, 186),
+				new Color(206, 238, 108), new Color(136, 196, 255), new Color(251, 140, 143), new Color(183, 228, 240), new Color(239, 228, 176),
+				new Color(209, 191, 230), new Color(207, 207, 207), new Color(255, 255, 186), new Color(251, 179, 233)};
 		for (int i = 0; i < Solver.publicBoard.length; i++) {
 			for (int j = 0; j < Solver.publicBoard[0].length; j++) {
 				g.setColor(colors[Solver.publicBoard[i][j]]);
 				g.fillRect(j * 50, i * 50, 50, 50);
+				g.setColor(Color.BLACK);
+				g.drawRect(j * 50, i * 50, 50, 50);
 			}
 		}
 	}
