@@ -8,6 +8,7 @@ public class Solver {
 	public static int[][] publicBoard;
 	public static ArrayList<int[][]> solutions = new ArrayList<>();
 	public static boolean allSolutions;
+	static int  loop;
 	
 	public static void solve(boolean[] used, int[][] board, Pentomino[] pentominoes, int delay) {
 		//Checking whether the given board is a multiple of 5 (otherwise it cannot be solved).
@@ -61,8 +62,10 @@ public class Solver {
 		for (int col = 0; col < board[0].length; col++) {
 			for (int row = 0; row < board.length; row++) {
 				if (board[row][col] == 0) {
-					if (gapSizeCheck(row, col) % 5 != 0)
+					if (loop > 0 && gapSizeCheck(row, col) % 5 != 0) {
+						loop++;
 						return;
+					}
 					for (int i = 0; i < pentominoes.length; i++) {
 						if (!used[i]) {
 							for (Pentomino p : pentominoes[i].getAllFormats()) {
